@@ -1,7 +1,7 @@
 /**
- * Sketch Name: Week 1 Dear Data Sketch
+ * Sketch Name: Dear Data Sketch
  * Author: Ahmed Mustapha DRAME
- * Description: This sketch includes an interactive visual representation with an audio playback.
+ * Description: This sketch includes an interactive visual representation, press C to see it !
  * 
  * Audio Attribution:
  * Title: "Hinoki Wood" As "ImJustAChillGuy" in my sketch
@@ -12,6 +12,8 @@
 import processing.sound.*;
 
 SoundFile chill_song;
+PImage bgImage; // Variable to store the background image
+boolean showEffect = false; // Toggle for the mosaic background
 // Let's be clear about my circle properties
 int numCircles = 15;  // Number of circles
 float arcRadius = 150;  // Radius of the arc
@@ -23,18 +25,24 @@ void setup() {
   background(200); // Grey background
   chill_song = new SoundFile(this, "ImJustAChillGuy.wav");
   
+  // Load the image
+  bgImage = loadImage("background.jpg");
+  if (bgImage != null){
+    bgImage.resize(width, height); // Resize it to fit the canvas
+  }
+  
   // Directly initialize the colors of the circles (they depict my attention around classes)
   circleColors[0] = color(255, 0, 0);  // Red
   circleColors[1] = color(165, 42, 42); // Brown
   circleColors[2] = color(0, 255, 255); // Turquoise
-  circleColors[3] = color(8, 28, 156); // Cobalt blue
+  circleColors[3] = color(255, 165, 0); // Orange
   circleColors[4] = color(0, 128, 0); // Green
   circleColors[5] = color(192, 192, 192); // Mixed grey/white
   circleColors[6] = color(0, 0, 0); // Mixed white/black
   circleColors[7] = color(128, 0, 0); // Burgundy Red
   circleColors[8] = color(0, 0, 255); // Blue
-  circleColors[9] = color(0, 0, 0); // Black
-  circleColors[10] = color(128, 60, 164); // Purple
+  circleColors[9] = color(0, 0, 255); // Blue
+  circleColors[10] = color(0, 128, 0); // Green
   circleColors[11] = color(255, 165, 0); // Orange
   circleColors[12] = color(0, 255, 255); // Turquoise
   circleColors[13] = color(255, 165, 0); // Orange
@@ -42,11 +50,37 @@ void setup() {
 }//they mostly represents colours classmates wore
 
 void draw() {
-  background(200);  // Clear background every frame
+  if (showEffect && bgImage != null){
+    background(30);
+    drawWavyMosaic();
+  } else {
+    background(200); // Clear background every frame
+  }
+  
   drawEye();  // Draw the background eye(the most important)
   drawCircles();  // Draw the circles around the eye
   drawArrow(mouseX, mouseY);  // Draw the arrow pointing to the mouse position
   
+}
+
+void drawWavyMosaic() {
+  int tileSize = 12;
+  for (int x = 0; x < width; x += tileSize) {
+    for (int y = 0; y < height; y += tileSize) {
+      
+      // Calculate a wave offset using the sine function. 
+      // frameCount animates it over time, x creates the rippling wave across the screen
+      float waveOffset = sin((x * 0.05) + (frameCount * 0.1)) * 15;
+      
+      // Get the color of the image at this specific coordinate
+      color c = bgImage.get(x, y);
+      
+      // Draw the mosaic tile, applying the wave offset to its Y position
+      fill(c);
+      noStroke();
+      rect(x, y + waveOffset, tileSize, tileSize);
+    }
+  }
 }
 
 void drawEye() {
@@ -125,7 +159,9 @@ void mousePressed() {
 }
 
 void keyPressed(){
-  if (key =='c'){
+  if (key =='c' || key == 'C') {
+    showEffect = !showEffect;
+    
     if(chill_song.isPlaying()){
       chill_song.stop();
     } else {
